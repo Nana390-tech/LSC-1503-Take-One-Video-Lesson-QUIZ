@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recording Check Quiz – LSC 1503</title>
+<style>
+:root{--a:#1B86B8;--a2:#2BA3D9;--b:#FF9F7A;--bl:#FFEDE5;--bg:#EAF6FB;--ink:#1F2433;--muted:#667085;--ok:#2E9E5B;--bad:#D64545}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;min-height:100vh}
+header{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;text-align:center;padding:22px 16px;border-bottom:6px solid var(--b)}
+header h1{font-size:1.8rem}
+main{max-width:760px;margin:0 auto;padding:20px 16px 50px}
+.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.08);margin-bottom:16px}
+h2{color:var(--a);margin-bottom:8px}
+.btn{border:none;border-radius:10px;padding:11px 20px;font-weight:700;cursor:pointer;font-size:1rem}
+.btn-a{background:var(--a);color:#fff}.btn-b{background:var(--b);color:var(--ink)}.btn-g{background:#fff;color:var(--a);border:2px solid var(--a)}
+input[type=text]{width:100%;max-width:380px;border:2px solid #DDD;border-radius:10px;padding:10px 12px;font-size:1rem}
+.bar{height:10px;background:#E8E8EE;border-radius:99px;overflow:hidden;margin:6px 0 14px}.bar div{height:100%;background:var(--b);transition:width .3s}
+.top{display:flex;justify-content:space-between;font-weight:700;color:var(--muted);font-size:.9rem}
+.q{font-size:1.15rem;font-weight:700;margin-bottom:14px}
+.opt{display:block;width:100%;text-align:left;border:2px solid #E3E3EA;background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:9px;font-size:1rem;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--a)}
+.opt.right{border-color:var(--ok);background:#EAF7EF}.opt.wrong{border-color:var(--bad);background:#FCECEC}
+.hint{background:var(--bl);border:2px dashed var(--b);border-radius:10px;padding:10px 12px;margin:8px 0;display:none}
+.hint.show{display:block}.hint .ar{direction:rtl;font-weight:700;font-size:1.1rem;color:var(--a)}
+.exp{margin-top:10px;padding:10px 14px;border-radius:10px;font-weight:600;display:none}.exp.show{display:block}
+.exp.good{background:#EAF7EF;color:#1E6B3E}.exp.bad{background:#FCECEC;color:#8A2525}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.big{font-size:3rem;font-weight:800;color:var(--a);text-align:center}
+.rv{border-left:5px solid var(--ok);padding:8px 12px;margin:8px 0;background:#FAFAFC;border-radius:8px}.rv.x{border-color:var(--bad)}
+.cert{border:8px double var(--a);border-radius:18px;padding:28px;text-align:center;background:linear-gradient(135deg,#fff,var(--bl))}
+.cert .name{font-size:1.7rem;font-weight:800;color:var(--a);border-bottom:2px solid var(--b);display:inline-block;padding:0 18px;margin:8px 0}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:16px}
+#cf{position:fixed;inset:0;pointer-events:none}
+@media print{header,footer,.no-print{display:none!important}body{background:#fff}}
+</style>
+</head>
+<body>
+<canvas id="cf"></canvas>
+<header><h1>🎥 Recording Check Quiz</h1><p>LSC 1503 · Communication Skills Portfolio · Lesson 3 quiz</p></header>
+<main id="app"></main>
+<footer>Designed by: Nazila Motahari · LSC 1503</footer>
+<script>
+const QS=[{"q": "Where should the light be when you record?", "o": ["On your face, from a window or lamp", "Behind you, from a big bright window", "Off, because a dark room looks calm", "Above you, pointing up at the ceiling"], "e": "Face the light. Light behind you makes your face dark (backlight).", "h": ["backlight", "إضاءة خلفية"]}, {"q": "What is the best framing for a talking-head video?", "o": ["Head and shoulders, in the middle", "Your whole body from far away", "Only your eyes and your nose", "The top of your head and the ceiling"], "e": "Head and shoulders, centred, looks professional.", "h": ["framing", "تأطير الصورة"]}, {"q": "Where should the camera be?", "o": ["At eye level", "On the desk, looking up", "On the floor", "Above you, looking down"], "e": "At eye level the viewer sees your face clearly, not your chin.", "h": ["eye level", "مستوى العين"]}, {"q": "How should you hold your phone to record?", "o": ["Landscape (sideways)", "Portrait (upright)", "Upside down", "It does not matter at all"], "e": "Landscape fits computer screens and video editors best.", "h": ["landscape", "وضع أفقي"]}, {"q": "How long is the in-class sample recording?", "o": ["60–90 seconds", "About 10 seconds", "About 10 minutes", "The full video"], "e": "A short sample of one part is enough to get feedback.", "h": ["sample", "عيّنة"]}, {"q": "What must you show at the start of your portfolio video?", "o": ["Your ID card", "Your cue cards", "Your LPA screenshot", "Your partner's face"], "e": "The ID card is needed for verification.", "h": ["verification", "التحقّق"]}, {"q": "Which is the most useful peer feedback?", "o": ["Your voice was clear. Next time, look up more.", "Your video was boring and I did not like it.", "Everything was perfect, so change nothing at all.", "Good."], "e": "Useful feedback is kind, specific and helps the speaker improve.", "h": ["peer feedback", "ملاحظات الزملاء"]}, {"q": "What does “trim” mean in video editing?", "o": ["Cut the start or end of a clip", "Add music to the whole video", "Make the whole video play faster", "Change the colours in the video"], "e": "Trim = cut the parts you don't need, like pressing record and stop.", "h": ["trim", "قصّ"]}, {"q": "Where do title slides go in your video?", "o": ["At the start and before each part", "Only at the very end of the video", "In the middle of your sentences", "Nowhere — they are not allowed"], "e": "Title slides help the viewer follow each section.", "h": ["title slide", "شريحة العنوان"]}, {"q": "The air conditioner is very loud. What should you do?", "o": ["Switch it off or move to a quiet room", "Speak much louder and just keep going", "Add loud music to hide all the noise", "Record in the living room next to the TV"], "e": "Clear sound is very important. Remove the noise first.", "h": ["background noise", "ضوضاء خلفية"]}, {"q": "How long should your final video be?", "o": ["3–5 minutes", "About 1 minute", "8–10 minutes", "As long as you like"], "e": "The final video should be about 3–5 minutes.", "h": ["length", "المدة"]}, {"q": "In “two stars and a wish”, what is the wish?", "o": ["One thing to improve", "Two things you liked", "A score out of ten", "A question for the teacher"], "e": "Two stars = two good things. A wish = one thing to improve.", "h": ["improve", "يحسّن"]}, {"q": "Which file type should you export your final video as?", "o": ["MP4", "PDF", "JSON", "DOCX"], "e": "MP4 is the standard video format.", "h": ["export", "تصدير"]}];
+let name="",order=[],cur=0,score=0,pts=0,answers=[],hintUsed=false;
+const app=document.getElementById("app");
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function start(){
+  app.innerHTML=`<div class="card"><h2>Recording Check Quiz</h2><p>${QS.length} questions about recording, feedback and editing. You need <b>80%</b> for your certificate.</p>
+  <p style="margin-top:8px;color:var(--muted)">💡 Stuck? Use a hint (Arabic support). A correct answer = 10 points, or 7 points with a hint.</p>
+  <div class="row"><input type="text" id="nm" placeholder="Type your full name"><button class="btn btn-a" onclick="begin()">Start ➜</button></div></div>`;
+}
+function begin(){const v=document.getElementById("nm").value.trim();if(!v){alert("Please type your name");return}name=v;
+  order=shuf(QS.map((q,i)=>({...q,opts:shuf(q.o.map((t,k)=>({t,ok:k===0})))})));cur=0;score=0;pts=0;answers=[];show()}
+function show(){
+  const q=order[cur];hintUsed=false;
+  app.innerHTML=`<div class="card"><div class="top"><span>Question ${cur+1} / ${order.length}</span><span>⭐ ${pts} pts</span></div>
+  <div class="bar"><div style="width:${cur/order.length*100}%"></div></div>
+  <div class="q">${esc(q.q)}</div>
+  ${q.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${esc(o.t)}</button>`).join("")}
+  <div class="hint" id="hint">🔑 <b>${esc(q.h[0])}</b> — <span class="ar">${esc(q.h[1])}</span></div>
+  <div class="exp" id="exp"></div>
+  <div class="row"><button class="btn btn-b" id="hb" onclick="hint()">💡 Hint (−3)</button><button class="btn btn-a" id="nx" style="display:none" onclick="next()">Next ➜</button></div></div>`;
+}
+function hint(){hintUsed=true;document.getElementById("hint").classList.add("show");document.getElementById("hb").disabled=true}
+function pick(i){
+  const q=order[cur],bs=[...document.querySelectorAll(".opt")];bs.forEach(b=>b.disabled=true);
+  const ok=q.opts[i].ok;q.opts.forEach((o,k)=>{if(o.ok)bs[k].classList.add("right")});if(!ok)bs[i].classList.add("wrong");
+  if(ok){score++;pts+=hintUsed?7:10}
+  answers.push({q:q.q,your:q.opts[i].t,right:q.o[0],ok});
+  const e=document.getElementById("exp");e.className="exp show "+(ok?"good":"bad");e.textContent=(ok?"✓ Correct! ":"✗ Not quite. ")+q.e;
+  document.getElementById("hb").style.display="none";document.getElementById("nx").style.display="inline-block";
+}
+function next(){cur++;cur<order.length?show():end()}
+function end(){
+  const pct=Math.round(score/order.length*100),pass=pct>=80;
+  app.innerHTML=`<div class="card"><h2>${pass?"🎉 Well done!":"Good effort!"}</h2><div class="big">${pct}%</div>
+  <p style="text-align:center">${score} / ${order.length} correct · ${pts} points</p>
+  ${pass?"":`<p style="text-align:center;margin-top:8px">You need 80% for the certificate. Review your answers and try again!</p>`}
+  <div class="row no-print" style="justify-content:center">${pass?`<button class="btn btn-a" onclick="cert()">🏆 My certificate</button>`:""}<button class="btn btn-b" onclick="begin()">↺ Try again</button><button class="btn btn-g" onclick="saveRes(${pct})">💾 Save result</button></div></div>
+  <div class="card"><h2>Review</h2>${answers.map((a,i)=>`<div class="rv ${a.ok?"":"x"}"><b>${i+1}. ${esc(a.q)}</b><br>Your answer: ${esc(a.your)}${a.ok?" ✓":`<br>Correct: <b>${esc(a.right)}</b>`}</div>`).join("")}</div>`;
+  if(pass)cf();
+}
+function cert(){
+  const pct=Math.round(score/order.length*100);
+  app.innerHTML=`<div class="cert"><div style="font-size:3rem">🏆</div><h2>Certificate of Achievement</h2><p>This certifies that</p><div class="name">${esc(name)}</div>
+  <p>passed the <b>Recording Check Quiz</b> with <b>${pct}%</b> (${pts} points).</p><p style="margin-top:6px">${new Date().toLocaleDateString("en-GB")}</p>
+  <p style="margin-top:12px;color:var(--muted);font-size:.85rem">Designed by: Nazila Motahari · LSC 1503</p></div>
+  <div class="row no-print" style="justify-content:center"><button class="btn btn-a" onclick="window.print()">🖨️ Print / PDF</button><button class="btn btn-g" onclick="end()">Back</button></div>`;cf();
+}
+function saveRes(pct){const d={quiz:"Recording Check Quiz",name,score,total:order.length,percent:pct,points:pts,date:new Date().toISOString(),answers};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.download=`RecordingCheck_${name.replace(/\s+/g,"_")}.json`;a.click()}
+function cf(){const c=document.getElementById("cf"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;const cols=["#1B86B8","#FF9F7A","#fff","#2BA3D9"];
+  const P=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,r:4+Math.random()*5,c:cols[Math.random()*4|0],v:2+Math.random()*3,s:Math.random()*6}));let f=0;
+  (function d(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.y+=p.v;p.x+=Math.sin((f+p.s)/10);x.fillStyle=p.c;x.fillRect(p.x,p.y,p.r,p.r*1.6)});if(++f<160)requestAnimationFrame(d);else x.clearRect(0,0,c.width,c.height)})()}
+start();
+</script>
+</body>
+</html>
